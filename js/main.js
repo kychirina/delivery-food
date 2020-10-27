@@ -52,10 +52,10 @@ function notAuthorized() {
         if(login){
             toggleModalAuth();
             loginForm.reset();
-            loginInput.style.border = '';
+            loginInput.style.borderColor = '';
         }else{
             alert('Введите логин');
-            loginInput.style.border = '1px solid red';
+            loginInput.style.borderColor = 'red';
         }
         checkAuth();
     }
