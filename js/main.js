@@ -77,4 +77,6 @@ function checkAuth() {
     }
 }
 
-checkAuth();
+if(authModal){
+    checkAuth();
+}
