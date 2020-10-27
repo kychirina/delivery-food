@@ -54,7 +54,7 @@ function notAuthorized() {
             loginForm.reset();
             loginInput.style.border = '';
         }else{
-            //alert('Введите логин');
+            alert('Введите логин');
             loginInput.style.border = '1px solid red';
         }
         checkAuth();
