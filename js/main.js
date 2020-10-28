@@ -1,13 +1,23 @@
+'use strict';
+
+const logo = document.querySelector('.logo');
+const authButton = document.querySelector('.button-auth');
+const outButton = document.querySelector('.button-out');
+const authModal = document.querySelector('.modal-auth');
+const authClose = document.querySelector(".close-auth");
+const loginForm = document.querySelector('#logInForm');
+const loginInput = document.querySelector('#login');
+const userName = document.querySelector('.user-name');
+const cardRestaurants = document.querySelector('.cards-restaurants');
+const promo = document.querySelector('.container-promo');
+const restaurants = document.querySelector('.restaurants');
+const menu = document.querySelector('.menu');
+const menuCard = document.querySelector('.cards-menu');
 const cartButton = document.querySelector("#cart-button");
 const modal = document.querySelector(".modal");
 const close = document.querySelector(".close");
 
-cartButton.addEventListener("click", toggleModal);
-close.addEventListener("click", toggleModal);
-
-function toggleModal() {
-  modal.classList.toggle("is-open");
-}
+let login = localStorage.getItem('gloDelivery');
 
 window.disableScroll = function(){
     const widthScroll = window.innerWidth - document.body.offsetWidth;
@@ -27,19 +37,7 @@ window.enableScroll = function(){
     window.scroll({top: document.body.dbScrollY});
 }
 
-
 /* ---------- DAY 1 ----------- */
-
-const authButton = document.querySelector('.button-auth');
-const outButton = document.querySelector('.button-out');
-const authModal = document.querySelector('.modal-auth');
-const authClose = document.querySelector(".close-auth");
-const loginForm = document.querySelector('#logInForm');
-const loginInput = document.querySelector('#login');
-const userName = document.querySelector('.user-name');
-
-let login = localStorage.getItem('gloDelivery');
-
 
 function authorized() {
     console.log('Авторизован');
@@ -95,6 +93,10 @@ function toggleModalAuth() {
     }
 }
 
+function toggleModal() {
+    modal.classList.toggle("is-open");
+}
+
 function clearForm() {
     loginForm.reset();
     loginInput.style.borderColor = '';
@@ -108,8 +110,82 @@ function checkAuth() {
     }
 }
 
+/* ---------- DAY 2 ----------- */
+
+function createCards() {
+    const cardItem = `
+    	<a href="restaurant.html" class="card card-restaurant">
+			<img src="img/pizza-plus/preview.jpg" alt="image" class="card-image"/>
+			<div class="card-text">
+				<div class="card-heading">
+					<h3 class="card-title">Пицца плюс11</h3>
+					<span class="card-tag tag">50 мин</span>
+				</div>
+				<div class="card-info">
+					<div class="rating">4.5</div>
+					<div class="price">От 900 ₽</div>
+					<div class="category">Пицца</div>
+				</div>
+			</div>
+		</a>
+    `;
+
+    cardRestaurants.insertAdjacentHTML('beforeend', cardItem);
+}
+
+function createCardGood() {
+    const card = document.createElement('div');
+
+    card.className = 'card';
+    card.insertAdjacentHTML('beforeend', `
+		<img src="img/pizza-plus/pizza-classic.jpg" alt="image" class="card-image"/>
+		<div class="card-text">
+			<div class="card-heading">
+				<h3 class="card-title card-title-reg">Пицца Классика</h3>
+			</div>
+			<div class="card-info">
+				<div class="ingredients">Соус томатный, сыр «Моцарелла», сыр «Пармезан», ветчина, салями, грибы.</div>
+			</div>
+			<div class="card-buttons">
+				<button class="button button-primary button-add-cart">
+					<span class="button-card-text">В корзину</span>
+					<span class="button-cart-svg"></span>
+				</button>
+				<strong class="card-price-bold">510 ₽</strong>
+			</div>
+		</div>
+    `);
+    menuCard.insertAdjacentElement('beforeend', card);
+}
+
+function openGoods(event){
+    const e = event.target;
+    const restaurant = e.closest('.card-restaurant');
+
+    event.preventDefault();
+    if(restaurant){
+        menuCard.textContent = '';
+        promo.classList.add("hide");
+        restaurants.classList.add("hide");
+        menu.classList.remove("hide");
+        createCardGood();
+    }
+}
+
+cardRestaurants.addEventListener('click', openGoods);
+
+logo.addEventListener('click', function () {
+    promo.classList.remove("hide");
+    restaurants.classList.remove("hide");
+    menu.classList.add("hide");
+});
+
+cartButton.addEventListener("click", toggleModal);
+
+close.addEventListener("click", toggleModal);
+
 authButton.addEventListener("click", clearForm);
 
-if(authModal){
-    checkAuth();
-}
+checkAuth();
+
+createCards();
