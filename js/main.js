@@ -51,10 +51,8 @@ function notAuthorized() {
         loginForm.removeEventListener("submit", logIn);
         if(login){
             toggleModalAuth();
-            loginForm.reset();
-            loginInput.style.borderColor = '';
+            clearForm();
         }else{
-            alert('Введите логин');
             loginInput.style.borderColor = 'red';
         }
         checkAuth();
@@ -62,11 +60,20 @@ function notAuthorized() {
     authButton.addEventListener("click", toggleModalAuth);
     authClose.addEventListener("click", toggleModalAuth);
     loginForm.addEventListener("submit", logIn);
-
+    authModal.addEventListener("click", function (event) {
+        if(event.target.classList.contains('is-open')){
+            toggleModalAuth();
+        }
+    });
 }
 
 function toggleModalAuth() {
     authModal.classList.toggle("is-open");
+}
+
+function clearForm() {
+    loginForm.reset();
+    loginInput.style.borderColor = '';
 }
 
 function checkAuth() {
@@ -76,6 +83,8 @@ function checkAuth() {
         notAuthorized();
     }
 }
+
+authButton.addEventListener("click", clearForm);
 
 if(authModal){
     checkAuth();
