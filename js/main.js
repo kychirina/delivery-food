@@ -114,7 +114,7 @@ function checkAuth() {
 
 function createCards() {
     const cardItem = `
-    	<a href="restaurant.html" class="card card-restaurant">
+    	<div class="card card-restaurant">
 			<img src="img/pizza-plus/preview.jpg" alt="image" class="card-image"/>
 			<div class="card-text">
 				<div class="card-heading">
@@ -127,7 +127,7 @@ function createCards() {
 					<div class="category">Пицца</div>
 				</div>
 			</div>
-		</a>
+		</div>
     `;
 
     cardRestaurants.insertAdjacentHTML('beforeend', cardItem);
@@ -162,7 +162,6 @@ function openGoods(event){
     const e = event.target;
     const restaurant = e.closest('.card-restaurant');
 
-    event.preventDefault();
     if(restaurant){
         if(login){
             menuCard.textContent = '';
