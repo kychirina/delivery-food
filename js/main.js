@@ -118,7 +118,7 @@ function createCards() {
 			<img src="img/pizza-plus/preview.jpg" alt="image" class="card-image"/>
 			<div class="card-text">
 				<div class="card-heading">
-					<h3 class="card-title">Пицца плюс11</h3>
+					<h3 class="card-title">Пицца плюс</h3>
 					<span class="card-tag tag">50 мин</span>
 				</div>
 				<div class="card-info">
@@ -164,11 +164,15 @@ function openGoods(event){
 
     event.preventDefault();
     if(restaurant){
-        menuCard.textContent = '';
-        promo.classList.add("hide");
-        restaurants.classList.add("hide");
-        menu.classList.remove("hide");
-        createCardGood();
+        if(login){
+            menuCard.textContent = '';
+            promo.classList.add("hide");
+            restaurants.classList.add("hide");
+            menu.classList.remove("hide");
+            createCardGood();
+        }else{
+            toggleModalAuth();
+        }
     }
 }
 
