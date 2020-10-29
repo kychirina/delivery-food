@@ -65,9 +65,6 @@ const getData = async function (url) {
     return await response.json();
 };
 
-let login = localStorage.getItem('gloDelivery');
-
-
 const toggleModalAuth = function() {
     authModal.classList.toggle("is-open");
     if(authModal.classList.contains('is-open')){
@@ -80,6 +77,8 @@ const toggleModalAuth = function() {
 const toggleModal = function() {
     modal.classList.toggle("is-open");
 }
+
+let login = localStorage.getItem('gloDelivery');
 
 /* ---------- AUTHORIZED ----------- */
 function authorized() {
