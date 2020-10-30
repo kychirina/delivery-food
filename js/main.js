@@ -97,8 +97,6 @@ function authorized() {
     function logOut() {
         login = null;
         localStorage.removeItem('gloDelivery');
-        cartLocal = null;
-        localStorage.removeItem('cartDelivery');
         authButton.style.display = '';
         outButton.style.display = '';
         userName.style.display = '';
