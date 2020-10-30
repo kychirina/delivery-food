@@ -53,8 +53,12 @@ const menu = document.querySelector('.menu');
 const info = document.querySelector('.info-menu');
 const menuCard = document.querySelector('.cards-menu');
 const cartButton = document.querySelector("#cart-button");
+const cartClear = document.querySelector(".clear-cart");
+const cartList = document.querySelector(".food-list");
+const cartTotal = document.querySelector('.modal-pricetag');
 const modal = document.querySelector(".modal");
 const close = document.querySelector(".close");
+const searchInput = document.querySelector(".input-search");
 
 const getData = async function (url) {
     const response = await fetch(url);
@@ -78,29 +82,34 @@ const toggleModal = function() {
     modal.classList.toggle("is-open");
 }
 
+const cart = [];
+
 let login = localStorage.getItem('gloDelivery');
+let cartLocal = JSON.parse(localStorage.getItem('cartDelivery'));
 
 /* ---------- AUTHORIZED ----------- */
 function authorized() {
-    console.log('Авторизован');
     function logOut() {
         login = null;
         localStorage.removeItem('gloDelivery');
+        cartLocal = null;
+        localStorage.removeItem('cartDelivery');
         authButton.style.display = '';
         outButton.style.display = '';
         userName.style.display = '';
+        cartButton.style.display = '';
         outButton.removeEventListener("click", logOut);
         checkAuth();
     }
     userName.textContent = login;
     authButton.style.display = 'none';
-    outButton.style.display = 'block';
+    outButton.style.display = 'flex';
     userName.style.display = 'inline';
+    cartButton.style.display = 'flex';
     outButton.addEventListener("click", logOut);
 }
 
 function notAuthorized() {
-    console.log('Не авторизован');
     function logIn(event) {
         event.preventDefault();
         login = loginInput.value;
@@ -232,26 +241,162 @@ function openGoods(event){
     }
 }
 
-cardRestaurants.addEventListener('click', openGoods);
+/* ----------  Search ----------  */
+searchInput.addEventListener('keypress', function (event) {
+    if(event.keyCode === 13){
+        const val = event.target.value.trim().toLowerCase();
+        let resLength = 0;
+        if(!val){
+            event.target.style.borderColor = 'red';
+            event.target.value = '';
+            setTimeout(function () {
+                event.target.style.borderColor = '';
+            }, 1500);
+            return;
+        }
+        getData('./db/partners.json')
+            .then(function (data) {
+                return data.map(function (el) {
+                    return el['products'];
+                });
+            })
+            .then(function (listProducts) {
+                menuCard.textContent = '';
+                listProducts.forEach(function (el) {
+                    getData(`./db/${el}`)
+                        .then(function (res) {
+                            const resSearch = res.filter(function (item) {
+                                if(item['name'].toLowerCase().includes(val) || item['description'].toLowerCase().includes(val)){
+                                    resLength ++;
+                                    return item;
+                                }
+                            });
 
-/* ---------- Return home ----------- */
-logo.addEventListener('click', function () {
-    promo.classList.remove("hide");
-    restaurants.classList.remove("hide");
-    menu.classList.add("hide");
+                            info.innerHTML = '<h2 class="section-title restaurant-title">Результат поиска: ' + resLength +'</h2>';
+                            promo.classList.add("hide");
+                            restaurants.classList.add("hide");
+                            menu.classList.remove("hide");
+                            resSearch.forEach(createCardGood);
+                        });
+                });
+            });
+
+    }
 });
 
-cartButton.addEventListener("click", toggleModal);
+/* ----------  Add Cart ----------  */
+function addCart(event) {
+    const target = event.target;
+    const btnCart = target.closest('.button-add-cart');
 
-close.addEventListener("click", toggleModal);
+    if(btnCart){
+        const card = target.closest('.card');
+        const title = card.querySelector('.card-title').textContent;
+        const price = card.querySelector('.card-price-bold').textContent;
+        const id = card.getAttribute('id');
+        const food = cart.find(function (el) {
+            return el.id === id;
+        });
+        if(food){
+            food.count += 1;
+        }else{
+            cart.push({
+                id: id,
+                title: title,
+                price: price,
+                count: 1
+            });
+            localStorage.setItem('cartDelivery', JSON.stringify(cart));
+        }
+    }
+}
+function renderCart() {
+    cartList.textContent = '';
+    cartLocal = JSON.parse(localStorage.getItem('cartDelivery'));
 
-authButton.addEventListener("click", clearForm);
+    if(cartLocal){
+        cartLocal.forEach(function ({ id, title, price, count}) {
+            const itemCartList = `
+    		<div class="food-row">
+				<span class="food-name">${title}</span>
+				<strong class="food-price">${price}</strong>
+				<div class="food-counter">
+					<button class="counter-button counter-minus" data-id="${id}">-</button>
+					<span class="counter">${count}</span>
+					<button class="counter-button counter-plus" data-id="${id}">+</button>
+				</div>
+			</div>
+        `;
+            cartList.insertAdjacentHTML('afterbegin', itemCartList);
+        });
 
-checkAuth();
+        const priceTotal = cartLocal.reduce(function (result, item) {
+            return result + (parseFloat(item.price) * item.count);
+        }, 0);
+        cartTotal.textContent = priceTotal + ' ₽';
+    }else{
+        cartTotal.textContent = '0 ₽';
+    }
+}
+function changeCount(event) {
+    const target = event.target;
+    const food = cart.find(function (el) {
+        return el.id === target.dataset.id;
+    });
+    if(target.classList.contains('counter-minus')){
+        food.count --;
+        if(food.count === 0){
+            cart.splice(cart.indexOf(food),1);
+        }
+    }
+    if(target.classList.contains('counter-plus')) food.count ++;
+    localStorage.setItem('cartDelivery', JSON.stringify(cart));
+    renderCart();
+}
 
-/* ----------  Get Data for Cards ----------  */
-getData('./db/partners.json').then(function (data) {
-    data.forEach(createCards);
-});
+function init(){
+    cardRestaurants.addEventListener('click', openGoods);
+
+    /* ---------- Return home ----------- */
+    logo.addEventListener('click', function () {
+        promo.classList.remove("hide");
+        restaurants.classList.remove("hide");
+        menu.classList.add("hide");
+    });
+
+    /* ---------- Cart ----------- */
+    // open and init cart
+    cartButton.addEventListener("click", function () {
+        renderCart();
+        toggleModal();
+    });
+    // change count cart
+    cartList.addEventListener("click", changeCount);
+    // clear cart
+    cartClear.addEventListener("click", function () {
+        cart.length = 0;
+        cartLocal = null;
+        localStorage.removeItem('cartDelivery');
+        renderCart();
+        toggleModal();
+    });
+    // add goods in cart
+    menuCard.addEventListener("click", addCart);
+
+    close.addEventListener("click", toggleModal);
+
+    authButton.addEventListener("click", clearForm);
+
+    checkAuth();
+
+    /* ----------  Get Data for Cards ----------  */
+    getData('./db/partners.json').then(function (data) {
+        data.forEach(createCards);
+    });
+}
+
+/* ----------  Initialization Page ----------  */
+init();
+
 
 
