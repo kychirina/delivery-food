@@ -80,6 +80,11 @@ const toggleModalAuth = function() {
 
 const toggleModal = function() {
     modal.classList.toggle("is-open");
+    if(modal.classList.contains('is-open')){
+        disableScroll();
+    }else{
+        enableScroll();
+    }
 }
 
 const cart = [];
