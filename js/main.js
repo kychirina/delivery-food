@@ -96,6 +96,8 @@ let cartLocal = JSON.parse(localStorage.getItem(login));
 function authorized() {
     function logOut() {
         login = null;
+        cartLocal = null;
+        cart.length = 0;
         localStorage.removeItem('gloDelivery');
         authButton.style.display = '';
         outButton.style.display = '';
