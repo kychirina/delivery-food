@@ -90,7 +90,7 @@ const toggleModal = function() {
 const cart = [];
 
 let login = localStorage.getItem('gloDelivery');
-let cartLocal = JSON.parse(localStorage.getItem('cartDelivery'));
+let cartLocal = JSON.parse(localStorage.getItem(login));
 
 /* ---------- AUTHORIZED ----------- */
 function authorized() {
@@ -309,13 +309,13 @@ function addCart(event) {
                 price: price,
                 count: 1
             });
-            localStorage.setItem('cartDelivery', JSON.stringify(cart));
+            localStorage.setItem(login, JSON.stringify(cart));
         }
     }
 }
 function renderCart() {
     cartList.textContent = '';
-    cartLocal = JSON.parse(localStorage.getItem('cartDelivery'));
+    cartLocal = JSON.parse(localStorage.getItem(login));
 
     if(cartLocal){
         cartLocal.forEach(function ({ id, title, price, count}) {
@@ -353,7 +353,7 @@ function changeCount(event) {
         }
     }
     if(target.classList.contains('counter-plus')) food.count ++;
-    localStorage.setItem('cartDelivery', JSON.stringify(cart));
+    localStorage.setItem(login, JSON.stringify(cart));
     renderCart();
 }
 
@@ -379,7 +379,7 @@ function init(){
     cartClear.addEventListener("click", function () {
         cart.length = 0;
         cartLocal = null;
-        localStorage.removeItem('cartDelivery');
+        localStorage.removeItem(login);
         renderCart();
         toggleModal();
     });
